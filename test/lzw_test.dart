@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:test/test.dart';
 import 'dart:math';
 import 'package:png_hide/lzw.dart';
+import 'package:png_hide/png_encoder.dart';
 
 void main() {
   test('alphabet_with_duplicates', () {
@@ -31,12 +34,12 @@ void main() {
     expect(result, [0, 0, 1, 2, 3, 3, 5]);
   });
 
-  test('lzw_simple34', () {
+  test('lzw_simple3', () {
     List<String> alphabet = ["a", "b", "c", "d"];
 
     LZW lzw = LZW(alphabet: alphabet, codeSize: 256);
 
-    List<int> result = lzw.addInput("aabcddaa").addInput("cdcba").finalize();
+    List<int> result = lzw.addInput("aabcddaa").finalize();
 
     expect(result, [0, 0, 1, 2, 3, 3, 5]);
   });
@@ -61,7 +64,7 @@ void main() {
 
     String input = "aabcdda";
     List<int> result = lzw.addInput(input).finalize();
-    String decoded = lzw2.decode(result);
+    String decoded = lzw2.decode(result).decoded;
 
     expect(input, decoded);
   });
@@ -74,13 +77,25 @@ void main() {
 
     String input = "aabcddaa";
     List<int> result = lzw.addInput(input).finalize();
-    String decoded = lzw2.decode(result);
 
-    expect(input, decoded);
+    expect(input, lzw2.decode(result).decoded);
   });
 
   test('test_complex', () {
-    List<String> alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l"];
+    List<String> alphabet = [
+      "a",
+      "b",
+      "c",
+      "d",
+      "e",
+      "f",
+      "g",
+      "h",
+      "i",
+      "j",
+      "k",
+      "l"
+    ];
 
     LZW lzw = LZW(alphabet: alphabet, codeSize: 256);
     LZW lzw2 = LZW(alphabet: alphabet, codeSize: 256);
@@ -98,19 +113,19 @@ void main() {
       }
 
       List<int> result = lzw.addInput(input).finalize();
-      expect(input, lzw2.decode(result));
+      expect(input, lzw2.decode(result).decoded);
+
+      lzw2.reset();
     }
   });
 
   test('test_reset', () {
     List<String> alphabet = ["a", "b", "c", "d"];
 
-    LZW lzw = LZW(alphabet: alphabet, codeSize: 8, debugEncoding: true);
+    LZW lzw = LZW(alphabet: alphabet, codeSize: 8, debugEncoding: false);
 
     String input = "ababcbabaaaaad";
     List<int> result = lzw.addInput(input).finalize();
-
-    print(result);
 
     expect(result, [0, 1, 5, 4, 2, 1, 0, 4, 1, 0, 6, 4, 0, 0, 3]);
   });
@@ -121,12 +136,51 @@ void main() {
     LZW lzw = LZW(
       alphabet: alphabet,
       codeSize: 8,
-      debugDecoding: false,
     );
 
     String input = "ababcbabaaaaad";
     List<int> result = lzw.addInput(input).finalize();
 
-    expect(input, lzw.decode(result));
+    expect(input, lzw.decode(result).decoded);
+  });
+
+  test('test_split', () {
+    List<String> alphabet = ["a", "b", "c", "d"];
+
+    LZW lzw = LZW(
+      alphabet: alphabet,
+      codeSize: 8,
+    );
+
+    String input = "ababcbabaaaaad";
+    List<int> result = lzw.addInput(input).finalize();
+
+    List<int> dec1 = result.sublist(0, result.length ~/ 2);
+    List<int> dec2 =
+        result.sublist((result.length ~/ 2), result.length);
+
+    expect(result.length, dec1.length + dec2.length);
+
+    expect(input, lzw.decode(dec1).decode(dec2).decoded);
+  });
+
+  test('test_png_alphabet', () {
+    LZW lzw = LZW(
+      alphabet: PngEncoder.alphabet,
+      codeSize: 256,
+    );
+
+    String input = "hallo ich bin ein text";
+
+    String b64Input = Base64Codec().encode(Utf8Codec().encode(input))+"}";
+
+    List<int> result = lzw.addInput(b64Input).finalize();
+
+    for(int i=0; i<result.length; i++) {
+      lzw.decode([result[i]]);
+    }
+    lzw.reset();
+
+    print(lzw.decoded);
   });
 }

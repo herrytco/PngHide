@@ -14,6 +14,9 @@ class LZW {
   List<int> _result = [];
   List<int> _output;
 
+  String _outString = "";
+  String get decoded => _outString;
+
   int _nextCodeWord;
   Map<String, dynamic> _codebook;
   Map<String, String> _symbolbook;
@@ -54,6 +57,11 @@ class LZW {
     return alphabet.contains(pattern) || _codebook.containsKey(pattern);
   }
 
+  void reset() {
+    _reset();
+    _outString = "";
+  }
+
   void _reset() {
     _codebook = {};
     _symbolbook = {};
@@ -73,20 +81,22 @@ class LZW {
     return null;
   }
 
-  String decode(List<int> lzw) {
-    String r = "";
+  LZW coder;
 
-    LZW coder = LZW(
-      alphabet: alphabet,
-      codeSize: codeSize,
-      debugEncoding: false,
-    );
+  LZW decode(List<int> lzw) {
+    if (coder == null) {
+      coder = LZW(
+        alphabet: alphabet,
+        codeSize: codeSize,
+        debugEncoding: false,
+      );
+    }
 
     for (int i = 0; i < lzw.length; i++) {
       int s = lzw[i];
 
       if (s < blank) {
-        r += alphabet[s];
+        _outString += alphabet[s];
         coder.addInput(alphabet[s]);
 
         if (debugDecoding) {
@@ -96,22 +106,19 @@ class LZW {
         String c = coder.getInverseCodeWord(s);
 
         if (c != null) {
-          r += c;
+          _outString += c;
           if (debugDecoding) print("$i: found $s -> '${c}' in the encoder");
           coder.addInput(c);
-        }
-        else {
-          String sNew = coder.praefix+coder.praefix[0];
+        } else {
+          String sNew = coder.praefix + coder.praefix[0];
 
-          r += sNew;
+          _outString += sNew;
           coder.addInput(sNew);
         }
       }
     }
 
-    _reset();
-
-    return r;
+    return this;
   }
 
   LZW addInput(String input) {
