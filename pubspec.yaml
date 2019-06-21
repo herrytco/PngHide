@@ -1,5 +1,7 @@
 name: png_hide
-description: This package can be used to encode Strings into PNG images.
+description: >-
+  Hide text and other content into PNG files. The passed content
+  gets encoded as Base64, then compressed using the LZW algorithm.
 version: 0.0.1
 author: Herry <herrytco@gmail.com>
 
