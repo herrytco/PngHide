@@ -83,7 +83,7 @@ class PngEncoder {
     LZW lzw = LZW(alphabet: alphabet, codeSize: 256);
 
     String b64Input = Base64Codec().encode(Utf8Codec().encode(text)) + "}";
-    List<int> encodedInput = lzw.addInput(b64Input).finalize();
+    List<int> encodedInput = lzw.addInput(b64Input).finalizeEncoding();
 
     if (targetImage.existsSync()) targetImage.delete();
     sourceImage.copySync(targetImage.path);
@@ -152,11 +152,15 @@ class PngEncoder {
 
         lzw.decode([byte]);
 
-        decoded = lzw.decoded[lzw.decoded.length - 1] == "}";
+        decoded =
+            lzw.temporaryDecodeResult[lzw.temporaryDecodeResult.length - 1] ==
+                "}";
       }
     }
 
-    String b64Decoded = lzw.decoded.substring(0, lzw.decoded.length -1);
+    String b64Decoded = lzw.finalizeDecoding();
+    b64Decoded = b64Decoded.substring(0, b64Decoded.length - 1);
+    
     String message = Utf8Codec().decode(Base64Codec().decode(b64Decoded));
 
     return message;

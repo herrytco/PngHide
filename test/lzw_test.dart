@@ -19,7 +19,7 @@ void main() {
 
     expect(lzw.blank, 4);
 
-    List<int> result = lzw.addInput("aabcdda").finalize();
+    List<int> result = lzw.addInput("aabcdda").finalizeEncoding();
 
     expect(result, [0, 0, 1, 2, 3, 3, 0]);
   });
@@ -29,7 +29,7 @@ void main() {
 
     LZW lzw = LZW(alphabet: alphabet, codeSize: 256);
 
-    List<int> result = lzw.addInput("aabcddaa").finalize();
+    List<int> result = lzw.addInput("aabcddaa").finalizeEncoding();
 
     expect(result, [0, 0, 1, 2, 3, 3, 5]);
   });
@@ -39,7 +39,7 @@ void main() {
 
     LZW lzw = LZW(alphabet: alphabet, codeSize: 256);
 
-    List<int> result = lzw.addInput("aabcddaa").finalize();
+    List<int> result = lzw.addInput("aabcddaa").finalizeEncoding();
 
     expect(result, [0, 0, 1, 2, 3, 3, 5]);
   });
@@ -49,8 +49,8 @@ void main() {
 
     LZW lzw = LZW(alphabet: alphabet, codeSize: 256);
 
-    List<int> result = lzw.addInput("aabcddaa").finalize();
-    List<int> result2 = lzw.addInput("aabcddaa").finalize();
+    List<int> result = lzw.addInput("aabcddaa").finalizeEncoding();
+    List<int> result2 = lzw.addInput("aabcddaa").finalizeEncoding();
 
     expect(result, [0, 0, 1, 2, 3, 3, 5]);
     expect(result2, [0, 0, 1, 2, 3, 3, 5]);
@@ -63,8 +63,8 @@ void main() {
     LZW lzw2 = LZW(alphabet: alphabet, codeSize: 256);
 
     String input = "aabcdda";
-    List<int> result = lzw.addInput(input).finalize();
-    String decoded = lzw2.decode(result).decoded;
+    List<int> result = lzw.addInput(input).finalizeEncoding();
+    String decoded = lzw2.decode(result).finalizeDecoding();
 
     expect(input, decoded);
   });
@@ -76,9 +76,9 @@ void main() {
     LZW lzw2 = LZW(alphabet: alphabet, codeSize: 256);
 
     String input = "aabcddaa";
-    List<int> result = lzw.addInput(input).finalize();
+    List<int> result = lzw.addInput(input).finalizeEncoding();
 
-    expect(input, lzw2.decode(result).decoded);
+    expect(input, lzw2.decode(result).finalizeDecoding());
   });
 
   test('test_complex', () {
@@ -97,25 +97,25 @@ void main() {
       "l"
     ];
 
-    LZW lzw = LZW(alphabet: alphabet, codeSize: 256);
-    LZW lzw2 = LZW(alphabet: alphabet, codeSize: 256);
-
-    int runs = 100;
-    int length = 200;
+    int runs = 500;
+    int length = 30000;
 
     Random rng = new Random();
 
     for (int i = 0; i < runs; i++) {
+      LZW lzw = LZW(alphabet: alphabet, codeSize: 256);
+      LZW lzw2 = LZW(alphabet: alphabet, codeSize: 256);
+
       String input = "";
 
       for (int j = 0; j < length; j++) {
         input += alphabet[rng.nextInt(alphabet.length)];
       }
 
-      List<int> result = lzw.addInput(input).finalize();
-      expect(input, lzw2.decode(result).decoded);
+      // print("input: $input");
 
-      lzw2.reset();
+      List<int> result = lzw.addInput(input).finalizeEncoding();
+      expect(input, lzw2.decode(result).finalizeDecoding());
     }
   });
 
@@ -125,7 +125,7 @@ void main() {
     LZW lzw = LZW(alphabet: alphabet, codeSize: 8, debugEncoding: false);
 
     String input = "ababcbabaaaaad";
-    List<int> result = lzw.addInput(input).finalize();
+    List<int> result = lzw.addInput(input).finalizeEncoding();
 
     expect(result, [0, 1, 5, 4, 2, 1, 0, 4, 1, 0, 6, 4, 0, 0, 3]);
   });
@@ -139,9 +139,9 @@ void main() {
     );
 
     String input = "ababcbabaaaaad";
-    List<int> result = lzw.addInput(input).finalize();
+    List<int> result = lzw.addInput(input).finalizeEncoding();
 
-    expect(input, lzw.decode(result).decoded);
+    expect(input, lzw.decode(result).finalizeDecoding());
   });
 
   test('test_split', () {
@@ -153,15 +153,14 @@ void main() {
     );
 
     String input = "ababcbabaaaaad";
-    List<int> result = lzw.addInput(input).finalize();
+    List<int> result = lzw.addInput(input).finalizeEncoding();
 
     List<int> dec1 = result.sublist(0, result.length ~/ 2);
-    List<int> dec2 =
-        result.sublist((result.length ~/ 2), result.length);
+    List<int> dec2 = result.sublist((result.length ~/ 2), result.length);
 
     expect(result.length, dec1.length + dec2.length);
 
-    expect(input, lzw.decode(dec1).decode(dec2).decoded);
+    expect(input, lzw.decode(dec1).decode(dec2).finalizeDecoding());
   });
 
   test('test_png_alphabet', () {
@@ -172,15 +171,15 @@ void main() {
 
     String input = "hallo ich bin ein text";
 
-    String b64Input = Base64Codec().encode(Utf8Codec().encode(input))+"}";
+    String b64Input = Base64Codec().encode(Utf8Codec().encode(input)) + "}";
 
-    List<int> result = lzw.addInput(b64Input).finalize();
+    List<int> result = lzw.addInput(b64Input).finalizeEncoding();
 
-    for(int i=0; i<result.length; i++) {
+    for (int i = 0; i < result.length; i++) {
       lzw.decode([result[i]]);
     }
     lzw.reset();
 
-    print(lzw.decoded);
+    print(lzw.finalizeDecoding());
   });
 }

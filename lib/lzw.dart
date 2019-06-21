@@ -15,7 +15,7 @@ class LZW {
   List<int> _output;
 
   String _outString = "";
-  String get decoded => _outString;
+  String get temporaryDecodeResult => _outString;
 
   int _nextCodeWord;
   Map<String, dynamic> _codebook;
@@ -23,6 +23,9 @@ class LZW {
 
   final bool debugEncoding;
   final bool debugDecoding;
+
+  bool _isEncoding = false;
+  bool _isDecoding = false;
 
   LZW({
     this.alphabet,
@@ -39,6 +42,35 @@ class LZW {
 
     _blank = alphabet.length;
     _reset();
+  }
+
+  String finalizeDecoding() {
+    String out = _outString;
+    reset();
+    _outString = "";
+
+    return out;
+  }
+
+  List<int> finalizeEncoding() {
+    if (_isPatternContainedInCodebook(_praefix)) {
+      _result.add(getCodeWord(_praefix));
+      _reset();
+    } else {
+      if (_isCodebookFull()) {
+        _result.add(blank);
+        _reset();
+      }
+
+      _result.add(_nextCodeWord);
+      _reset();
+    }
+
+    _praefix = "";
+    _output = _result;
+    _result = [];
+
+    return _output;
   }
 
   int getCodeWord(String pattern) {
@@ -84,6 +116,9 @@ class LZW {
   LZW coder;
 
   LZW decode(List<int> lzw) {
+    if (_isEncoding) throw IllegalStateException("still encoding.");
+    _isDecoding = true;
+
     if (coder == null) {
       coder = LZW(
         alphabet: alphabet,
@@ -159,26 +194,5 @@ class LZW {
     }
 
     return this;
-  }
-
-  List<int> finalize() {
-    if (_isPatternContainedInCodebook(_praefix)) {
-      _result.add(getCodeWord(_praefix));
-      _reset();
-    } else {
-      if (_isCodebookFull()) {
-        _result.add(blank);
-        _reset();
-      }
-
-      _result.add(_nextCodeWord);
-      _reset();
-    }
-
-    _praefix = "";
-    _output = _result;
-    _result = [];
-
-    return _output;
   }
 }

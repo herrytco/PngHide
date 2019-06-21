@@ -1,8 +1,7 @@
 name: png_hide
-description: A sample command-line application.
-# version: 1.0.0
-# homepage: https://www.example.com
-# author: Herry <herrytco@gmail.com>
+description: This package can be used to encode Strings into PNG images.
+version: 0.0.1
+author: Herry <herrytco@gmail.com>
 
 environment:
   sdk: '>=2.2.0 <3.0.0'
