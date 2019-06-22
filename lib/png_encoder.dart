@@ -13,7 +13,7 @@ class PngEncoder {
   File targetImage;
 
   /// The alphabet used. Contains the 65 Base64 symbols together with the '}' symbol as stopword.
-  static final List<String> alphabet = const [
+  static final List<String> alphabet = [
     'a',
     'b',
     'c',
@@ -126,7 +126,7 @@ class PngEncoder {
 
         img.setPixel(x, y, pixel.result);
 
-        print("${pixel.result} ($byte) ($b1 $b2 $b3 $b4)");
+        // print("${pixel.result} ($byte) ($b1 $b2 $b3 $b4)");
       }
     }
 
