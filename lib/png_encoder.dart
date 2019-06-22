@@ -8,6 +8,7 @@ import 'package:image/image.dart';
 class PngEncoder {
   /// is the base-image used for encoding. it will NOT be changed.
   File sourceImage;
+
   /// The target image, where the encoded result will be stored. Will be overwritten if existing.
   File targetImage;
 
@@ -81,7 +82,7 @@ class PngEncoder {
     '}',
   ];
 
-  /// Creates a new instance of the PngEncoder. 
+  /// Creates a new instance of the PngEncoder.
   PngEncoder(this.sourceImage, this.targetImage);
 
   /// copies [sourceImage] to [targetImage] and encodes the String into the target.
@@ -167,7 +168,7 @@ class PngEncoder {
 
     String b64Decoded = lzw.finalizeDecoding();
     b64Decoded = b64Decoded.substring(0, b64Decoded.length - 1);
-    
+
     String message = Utf8Codec().decode(Base64Codec().decode(b64Decoded));
 
     return message;

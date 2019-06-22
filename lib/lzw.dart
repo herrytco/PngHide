@@ -162,7 +162,7 @@ class LZW {
   /// LZW instance used for decoding as an encoding step will be performed parallel.
   LZW coder;
 
-  /// feeds a list of numbers into the decoder. This can be done as many times as needed. To finalize, 
+  /// feeds a list of numbers into the decoder. This can be done as many times as needed. To finalize,
   /// the method [finalizeDecoding()] has to be called.
   LZW decode(List<int> lzw) {
     if (_isEncoding) throw IllegalStateException("still encoding.");
@@ -205,10 +205,15 @@ class LZW {
     return this;
   }
 
-
-  /// feeds a String into the encoder. This can be done as many times as needed. To finalize, 
+  /// feeds a String into the encoder. This can be done as many times as needed. To finalize,
   /// the method [finalizeEncoding()] has to be called.
   LZW addInput(String input) {
+    if (_isDecoding) {
+      throw new IllegalStateException(
+          "cannot start encoding while decoding is done");
+    }
+    _isEncoding = true;
+
     for (int i = 0; i < input.length; i++) {
       if (debugEncoding) print("");
 
