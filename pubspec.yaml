@@ -2,7 +2,7 @@ name: png_hide
 description: >-
   Hide text and other content into PNG files. The passed content
   gets encoded as Base64, then compressed using the LZW algorithm.
-version: 0.0.1
+version: 0.0.2
 author: Herry <herrytco@gmail.com>
 homepage: https://github.com/herrytco/
 environment:
