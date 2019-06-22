@@ -1,13 +1,22 @@
 class BitData {
+  /// stores the assembled integer the bits form
   int _source;
+
+  /// represents the assembled integer
   int get result => _source;
 
+  /// creates a new BitData object with an integer as base.
   BitData(this._source);
 
-  int getBit(int pos) {
-    return (_source & (1 << pos)) >> pos;
+  /// returns the bit on [position], starting by 0 (big endian).
+  int getBit(int position) {
+    return (_source & (1 << position)) >> position;
   }
 
+  /// sets the bit on [position] to [value]
+  ///
+  /// 'true' ... 1
+  /// 'false' ... 0
   void setBit(int pos, bool value) {
     if (value) {
       //set bit to 1
@@ -18,6 +27,7 @@ class BitData {
     }
   }
 
+  /// returns the String representation of the BitData. It contains the binary representation as well as the integer.
   @override
   String toString() {
     List<int> result = [];

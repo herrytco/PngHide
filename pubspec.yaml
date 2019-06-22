@@ -4,7 +4,7 @@ description: >-
   gets encoded as Base64, then compressed using the LZW algorithm.
 version: 0.0.1
 author: Herry <herrytco@gmail.com>
-
+homepage: https://github.com/herrytco/
 environment:
   sdk: '>=2.2.0 <3.0.0'
 

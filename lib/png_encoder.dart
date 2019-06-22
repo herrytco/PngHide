@@ -4,11 +4,15 @@ import 'lzw.dart';
 import 'bit_data.dart';
 import 'package:image/image.dart';
 
+/// Instance of an encoder, which is used to hide texts in PNG images.
 class PngEncoder {
+  /// is the base-image used for encoding. it will NOT be changed.
   File sourceImage;
+  /// The target image, where the encoded result will be stored. Will be overwritten if existing.
   File targetImage;
 
-  static final List<String> alphabet = [
+  /// The alphabet used. Contains the 65 Base64 symbols together with the '}' symbol as stopword.
+  static final List<String> alphabet = const [
     'a',
     'b',
     'c',
@@ -77,8 +81,10 @@ class PngEncoder {
     '}',
   ];
 
+  /// Creates a new instance of the PngEncoder. 
   PngEncoder(this.sourceImage, this.targetImage);
 
+  /// copies [sourceImage] to [targetImage] and encodes the String into the target.
   void encode(String text) {
     LZW lzw = LZW(alphabet: alphabet, codeSize: 256);
 
@@ -126,6 +132,7 @@ class PngEncoder {
     targetImage.writeAsBytesSync(writePng(img));
   }
 
+  /// tries to decode [targetImage] and returns the String hidden in it.
   String decode() {
     LZW lzw = LZW(alphabet: alphabet, codeSize: 256);
 
